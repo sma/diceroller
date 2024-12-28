@@ -21,7 +21,7 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
       - name: Build Flutter Web
-        run: flutter build web --release
+        run: flutter build web --release --base-href=/diceroller/
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
