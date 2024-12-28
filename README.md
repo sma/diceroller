@@ -2,19 +2,20 @@
 
 A simple Flutter app to roll "funky dice" created in one hour.
 
-![Screenshot](screenshot.png)
+[![Screenshot](screenshot.png)](https://sma.github.io/diceroller/)
+
+> [!NOTE]
+> Here's a [live version of the app](https://sma.github.io/diceroller/).
 
 See the article below.
 
 ---
----
----
 
-One hour till game night and I forgot to bring my dice.
+**One hour till game night and I forgot to bring my dice.**
 
-So let's create a simple dice roller app in Flutter.
+So let's create a simple **dice roller** app in Flutter.
 
-This is a dramatic recreation of a real story from a few years ago, but I have adapted the code to the current version of Flutter.
+This is a dramatic retelling of a real story from a few years ago. I have adapted the code to the current version of Flutter, though.
 
 We've got 60 minutes, so let's get started:
 
