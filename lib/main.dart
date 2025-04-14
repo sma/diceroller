@@ -55,7 +55,7 @@ final model = ValueNotifier<List<DieResult>>([]);
 extension on ValueNotifier<List<DieResult>> {
   void add(Die die) => value = [...value, die.roll()];
 
-  void remove(DieResult result) => value = value.toList()..remove(result);
+  void remove(DieResult result) => value = [...value]..remove(result);
 
   void clear() => value = [];
 
@@ -73,10 +73,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.dark(),
-      home: DiceRoller(),
-    );
+    return MaterialApp(theme: ThemeData.dark(), home: DiceRoller());
   }
 }
 
@@ -100,17 +97,9 @@ class DiceRoller extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: ResultsBox(),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Commands(),
-          ),
-          Expanded(
-            child: DieButtonGrid(),
-          ),
+          Padding(padding: const EdgeInsets.all(16), child: ResultsBox()),
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Commands()),
+          Expanded(child: DieButtonGrid()),
         ],
       ),
     );
@@ -125,24 +114,9 @@ class Commands extends StatelessWidget {
     return Row(
       spacing: 8,
       children: [
-        Expanded(
-          child: CommandButton(
-            onPressed: model.clear,
-            label: Text('Clear'),
-          ),
-        ),
-        Expanded(
-          child: CommandButton(
-            onPressed: model.reroll,
-            label: Text('Reroll'),
-          ),
-        ),
-        Expanded(
-          child: CommandButton(
-            onPressed: model.sort,
-            label: Text('Sort'),
-          ),
-        ),
+        Expanded(child: CommandButton(onPressed: model.clear, label: Text('Clear'))),
+        Expanded(child: CommandButton(onPressed: model.reroll, label: Text('Reroll'))),
+        Expanded(child: CommandButton(onPressed: model.sort, label: Text('Sort'))),
       ],
     );
   }
@@ -160,9 +134,7 @@ class CommandButton extends StatelessWidget {
       style: FilledButton.styleFrom(
         backgroundColor: Colors.blueGrey.shade800,
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(2),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
         padding: EdgeInsets.all(8),
       ),
       onPressed: onPressed,
@@ -178,18 +150,13 @@ class ResultsBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: model,
-      builder: (context, _) => Container(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        constraints: BoxConstraints(minHeight: 56 * 2 + 8 + 16),
-        padding: EdgeInsets.all(8),
-        child: Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final result in model.value) Result(result),
-          ],
-        ),
-      ),
+      builder:
+          (context, _) => Container(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            constraints: BoxConstraints(minHeight: 56 * 2 + 8 + 16),
+            padding: EdgeInsets.all(8),
+            child: Wrap(spacing: 8, runSpacing: 8, children: [for (final result in model.value) Result(result)]),
+          ),
     );
   }
 }
@@ -207,9 +174,7 @@ class Result extends StatelessWidget {
         style: FilledButton.styleFrom(
           backgroundColor: result.die.color,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(2),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
           padding: EdgeInsets.all(4),
           fixedSize: Size(56, 56),
         ),
@@ -220,15 +185,9 @@ class Result extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FittedBox(
-              child: Text(
-                '${result.result}',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(height: 1),
-              ),
+              child: Text('${result.result}', style: Theme.of(context).textTheme.headlineSmall?.copyWith(height: 1)),
             ),
-            Text(
-              'd${result.die.sides}',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(height: 1),
-            ),
+            Text('d${result.die.sides}', style: Theme.of(context).textTheme.labelSmall?.copyWith(height: 1)),
           ],
         ),
       ),
@@ -246,11 +205,7 @@ class DieButtonGrid extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       mainAxisSpacing: 8,
       crossAxisSpacing: 8,
-      children: [
-        ...Die.dice.map(
-          (die) => DieButton(die: die),
-        ),
-      ],
+      children: [...Die.dice.map((die) => DieButton(die: die))],
     );
   }
 }
@@ -284,13 +239,14 @@ class BadgePainter extends CustomPainter {
     canvas
       ..translate(size.width, 0)
       ..drawPath(
-          Path()
-            ..moveTo(-24, 0)
-            ..lineTo(0, 24)
-            ..lineTo(0, 12)
-            ..lineTo(-12, 0)
-            ..close(),
-          _paint);
+        Path()
+          ..moveTo(-24, 0)
+          ..lineTo(0, 24)
+          ..lineTo(0, 12)
+          ..lineTo(-12, 0)
+          ..close(),
+        _paint,
+      );
   }
 
   @override
@@ -314,33 +270,33 @@ class DieDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           ListenableBuilder(
-              listenable: exploding,
-              builder: (context, _) {
-                return TextButton.icon(
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    iconColor: Colors.white,
-                    fixedSize: Size.fromHeight(40),
-                  ),
-                  onPressed: () {
-                    exploding.value = !exploding.value;
-                  },
-                  icon: exploding.value //
-                      ? Icon(Icons.check_box)
-                      : Icon(Icons.check_box_outline_blank),
-                  label: Text('Exploding dice'),
-                );
-              }),
+            listenable: exploding,
+            builder: (context, _) {
+              return TextButton.icon(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  iconColor: Colors.white,
+                  fixedSize: Size.fromHeight(40),
+                ),
+                onPressed: () {
+                  exploding.value = !exploding.value;
+                },
+                icon:
+                    exploding
+                            .value //
+                        ? Icon(Icons.check_box)
+                        : Icon(Icons.check_box_outline_blank),
+                label: Text('Exploding dice'),
+              );
+            },
+          ),
           for (var i = 1; i <= 12; i += 3)
             Row(
               children: [
                 for (var j = 0; j < 3; j++)
                   Expanded(
                     child: TextButton(
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        fixedSize: Size.fromHeight(40),
-                      ),
+                      style: TextButton.styleFrom(foregroundColor: Colors.white, fixedSize: Size.fromHeight(40)),
                       onPressed: () {
                         _roll(i + j);
                         Navigator.of(context).pop();

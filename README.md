@@ -11,7 +11,7 @@ See the article below.
 
 ---
 
-**One hour till game night and I forgot to bring my dice.**
+***One hour till game night and I forgot to bring my dice.***
 
 So let's create a simple **dice roller** app in Flutter.
 
@@ -23,9 +23,9 @@ We've got 60 minutes, so let's get started:
 
 I imagine a single-page app that has a grid of buttons similar to a calculator, representing different dice types, and a region above those buttons to show the results of rolling the dice if buttons are tapped. All results are accumulated. Tapping a result will remove it from the display. This way, it's easy to roll 1d6+1d8 or 2d20 or whatever combination of dice is needed. I expect the user to interpret the results as required by the game rules.
 
-Typical dice are d4, d6, d8, d10 and d20. But I want to support [Dungeon Crawl Classics](https://en.wikipedia.org/wiki/Dungeon_Crawl_Classics) (DCC), which uses even more funky dice: a d2, d3, d5, and d7 should be supported too. I think there's no d9, but a d12, d14, d16, and d24. For games like [Call of Cthulhu](https://en.wikipedia.org/wiki/Call_of_Cthulhu_(role-playing_game)), we have to support the d100. And while we're at it, and because a 4x4 grid should look best, I'll also add a d30 and a d50.
+Typical dice are d4, d6, d8, d12 and d20. But I want to support [Dungeon Crawl Classics](https://en.wikipedia.org/wiki/Dungeon_Crawl_Classics) (DCC), which uses even more funky dice: a d2, d3, d5, and d7 should be supported too. I think there's no d9, but a d10, d14, d16, and d24. For games like [Call of Cthulhu](https://en.wikipedia.org/wiki/Call_of_Cthulhu_(role-playing_game)), we have to support the d100. And while we're at it, and because a 4x4 grid should look best, I'll also add a d30 and a d50.
 
-To represent a die, I use a `Die` class:
+To represent dice, I use a `Die` class:
 
     class Die {
       Die(this.sides, this.color);
@@ -65,7 +65,7 @@ Next, let's define all `dice`:
       ...
     }
 
-54 minutes left. I can't spend too much time on these colors. They must not be too bright, because I want to use white text – and using both white and black text looks inconsistent, IMHO.
+54 minutes left. I can't spend too much time on these colors. I eyeballed them. They must not be too bright, because I want to use white text – and using both white and black text looks inconsistent, IMHO.
 
 To represent a die result, I use a `DieResult` class. It refers to the die used to roll it, so I have access to the color and I know whether the maximum value was rolled or not.
 
@@ -89,7 +89,7 @@ To represent a die result, I use a `DieResult` class. It refers to the die used 
       DieResult roll() => DieResult(this, random.nextInt(sides) + 1);
     }
 
-51 minutes. Who needs dependency injection if a global variable can also do the trick. So `model` is a value notifier to display a list of die results.
+51 minutes. Who needs dependency injection if a global variable can also do the trick. So `model` is a value notifier to provide a list of die results.
 
     final model = ValueNotifier<List<DieResult>>([
       // just to test this, replace with [] later
@@ -104,9 +104,7 @@ Here's my "business logic" added to my "domain model":
     extension on ValueNotifier<List<DieResult>> {
       void add(Die die) => value = [...value, die.roll()];
 
-      void remove(DieResult result) {
-        value = value.toList()..remove(result);
-      }
+      void remove(DieResult result) => value = [...value]..remove(result);
     }
 
 47 minutes. I need to start with the app. This is just the existing boilerplate code with a dark theme added:
@@ -194,7 +192,7 @@ Now let's start the app for the first time and check whether anything is display
       }
     }
 
-Also, I actually wrote everything in a single `build` method and only refactored the code later, because I'm not that good to create a perfect top-down structure in my head. I didn't bother to extract the button colors into a theme, though.
+Also, I actually wrote everything in a single `build` method and only refactored the code later, because I'm not that good to create a perfect top-down structure in my head. And I didn't bother to extract the button colors into a theme.
 
 Here's the button that will add a new result to the model to show it in the `ResultsBox`:
 
@@ -244,9 +242,11 @@ Here's the button that will add a new result to the model to show it in the `Res
       }
     }
 
-Initially I called this widget `DieResult`, wondering why this didn't work, only then remembering that I already called by model by this name. So, it's just a `Result` which is a rather bad name. Time was too short to find a better one.
+Initially I called this widget `DieResult`, wondering why this didn't work, only then remembering that I already called my model by this name. So, it's just a `Result` which is a rather bad name. Time was too short to find a better one.
 
-I noticed that just using the color wasn't enough to know which kind of die was rolled, so I added the type as a label. While testing the UI, I noticed that a 100 result of the d100 didn't fit the widget, so I added a `FittedBox`. This was probably the leg of the journey that took the most time.
+I noticed that just using the color wasn't enough to know which kind of die was rolled, so I added the type as a label. While testing the UI, I noticed that a 100 result of the d100 didn't fit the widget, so I added a `FittedBox`.
+
+This was probably the leg of the journey that took the most time.
 
     class Result extends StatelessWidget {
       const Result(this.result, {super.key});
@@ -285,7 +285,7 @@ I noticed that just using the color wasn't enough to know which kind of die was 
       }
     }
 
-27 minutes. The app is basically ready to use. But it can be improved. Clearing the result box by tapping all results is cumbersome. So I should add a some commands. Besides a "clear" button, I'll also add a "reroll" button and a "sort" button. This is handy if you need to find the best (or worst) result fast.
+27 minutes. The app is basically ready to use. But it can be improved. Clearing the result box by tapping all results is cumbersome. So I should add some commands. Besides a "clear" button, I'll also add a "reroll" button and a "sort" button. This is handy if you need to find the best (or worst) result fast.
 
 I extend my "business logic":
 
@@ -507,14 +507,14 @@ With just 1 minute left, I quickly add an `onLongPress` property to the die butt
 
 And the only thing left to do it deploy the app to some website so that I can access it from my iPhone and add it to my home screen so it looks like any other app.
 
-When I originally wrote this, I used Vercel, then still called "now" which had a `now` CLI command that could be used to host any folder with a static `index.html` with a single CLI command. Feel free to use any service you like. Github pages seems to be a good option.
+When I originally wrote this, I used Vercel, then still called "now", which had a `now` CLI command that could be used to host any folder with a static `index.html` with a single CLI command. Feel free to use any service you like. Github pages seems to be a good option.
 
-If you want to extend the app, here are some ideas. 
+If you want to extend the app, here are some ideas: 
 
-+ Rerolling should not reroll the exploded dice, just the original once and of course explode dice again. This could be done by adding an `exploded` flag to `DieResult`.
++ Rerolling should not reroll the exploded dice, just the original ones and of course explode dice again. This could be done by adding an `exploded` flag to `DieResult`.
 + Mark not only the maximum values, but also the minimum values, because for example Modiphius' [Star Trek](https://en.wikipedia.org/wiki/Star_Trek_Adventures) uses 1 as a critical success.
 + And whole you're on it, also mark the exploded dice.
-+ Then, allow the user to switch from the dice grid to a list of preconfigured die rolls (which can be edited of course) that are be specified using the usual notation like `2d20+1` with extensions like `4d6kh3` which shall mean that from rolling 4 six-sided dice I want to keep the highest 3 or `10d6cs=6` which shall mean that I roll 10 six-sided dice and then count the number of dice that show a six.
++ Then, allow the user to switch from the dice grid to a list of preconfigured die rolls (which can be edited of course) that are be specified using the usual notation like `2d20+1` with extensions like `4d6kh3` which shall mean that from rolling 4 six-sided dice I want to keep the highest 3 or `10d6cs=6` which shall mean that I roll 10 six-sided dice and then count the number of dice that show a six as a success.
 + Add some dice rolling animations.
 + Make those dice 3D.
 + Roll them if you shake your phone.
